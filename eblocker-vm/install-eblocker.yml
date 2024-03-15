@@ -1,0 +1,70 @@
+---
+- name: Install eBlocker software on eBlocker VM
+  hosts: all
+  become: true
+  become_method: su
+  environment:
+    PATH: /usr/sbin:/usr/bin
+  vars:
+    eblocker_env: 'prod'
+    files_base: 'files'
+    conf_base: '/opt/eblocker-icap/conf'
+
+  tasks:
+    - name: Create configuration directory
+      ansible.builtin.file:
+        path: "{{conf_base}}"
+        state: directory
+        mode: '0755'
+
+    - name: Copy eBlocker configuration properties
+      ansible.builtin.copy:
+        src: "{{files_base}}/configuration-{{eblocker_env}}.properties"
+        dest: "{{conf_base}}/configuration.properties"
+
+    - name: Copy CPU info
+      ansible.builtin.copy:
+        src: "{{files_base}}/cpuinfo.txt"
+        dest: "{{conf_base}}/cpuinfo.txt"
+
+    - name: Install apt-transport-https
+      ansible.builtin.apt:
+        update_cache: true
+        name: apt-transport-https
+
+    - name: Copy eBlocker bootstrap package
+      ansible.builtin.copy:
+        src: "{{files_base}}/eblocker-bootstrap_amd64_buster-prod.deb"
+        dest: /tmp/eblocker-bootstrap.deb
+
+    - name: Install eBlocker bootstrap package
+      ansible.builtin.apt:
+        deb: /tmp/eblocker-bootstrap.deb
+
+    - name: Clean up eBlocker bootstrap package file
+      ansible.builtin.file:
+        path: /tmp/eblocker-bootstrap.deb
+        state: absent
+
+    - name: Copy license key
+      ansible.builtin.copy:
+        src: "{{files_base}}/license.key"
+        dest: /opt/eblocker-icap/keys/license.key
+
+    - name: Copy license certificate
+      ansible.builtin.copy:
+        src: "{{files_base}}/license.cert"
+        dest: /opt/eblocker-icap/keys/license.cert
+
+    - name: Install VM tools
+      ansible.builtin.apt:
+        update_cache: true
+        name: open-vm-tools, qemu-guest-agent
+
+    - name: Upgrade distribution
+      ansible.builtin.apt:
+        upgrade: dist
+
+    - name: Install eBlocker software
+      ansible.builtin.apt:
+        name: eblocker-baseconfig, eblocker-lists

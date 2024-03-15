@@ -1,0 +1,66 @@
+---
+- name: Clean up after eBlocker installation on eBlocker VM
+  hosts: all
+  become: true
+  become_method: su
+  environment:
+    PATH: /usr/sbin:/usr/bin
+  vars:
+    eblocker_env: 'prod'
+    files_base: 'files'
+
+  tasks:
+    # Only in the test environment: replace production with test bootstrap package
+    - name: Remove production bootstrap package
+      when: eblocker_env == "test"
+      ansible.builtin.apt:
+        name: eblocker-bootstrap
+        state: absent
+
+    - name: Copy test bootstrap package
+      when: eblocker_env == "test"
+      ansible.builtin.copy:
+        src: "{{files_base}}/eblocker-bootstrap_amd64_buster-test.deb"
+        dest: /tmp/eblocker-bootstrap.deb
+
+    - name: Install test bootstrap package
+      when: eblocker_env == "test"
+      ansible.builtin.apt:
+        deb: /tmp/eblocker-bootstrap.deb
+
+    - name: Clean up eBlocker bootstrap package file
+      when: eblocker_env == "test"
+      ansible.builtin.file:
+        path: /tmp/eblocker-bootstrap.deb
+        state: absent
+
+    # For all environments:
+    - name: Disable DHCP server
+      ansible.builtin.systemd_service:
+        name: isc-dhcp-server
+        enabled: false
+
+    - name: Clean downloaded packages
+      ansible.builtin.apt:
+        clean: true
+
+    - name: Find SSH keys
+      ansible.builtin.find:
+        paths: /etc/ssh/
+        patterns: 'ssh_host_*_key,ssh_host_*_key.pub'
+      register: files_to_delete
+
+    - name: Remove SSH keys
+      ansible.builtin.file:
+        path: "{{item.path}}"
+        state: absent
+      loop: "{{files_to_delete.files}}"
+
+    - name: Disable SSH
+      ansible.builtin.systemd_service:
+        name: ssh
+        enabled: false
+
+    - name: Manual steps
+      ansible.builtin.debug:
+        msg: 'Please remove the eblockerbuild user and lock the root account now manually at the console. SSH is disabled.'

@@ -1,0 +1,27 @@
+---
+- name: Prepare ethernet configuration for eBlocker VM
+  hosts: all
+  become: true
+  become_method: su
+
+  tasks:
+    - name: Configure legacy ethernet interface names
+      ansible.builtin.replace:
+        path: /etc/default/grub
+        regexp: 'GRUB_CMDLINE_LINUX=.*'
+        replace: 'GRUB_CMDLINE_LINUX="net.ifnames=0"'
+
+    - name: Update Grub
+      ansible.builtin.command: update-grub
+      environment:
+        PATH: /usr/sbin:/usr/bin
+
+    - name: Replace interface name in network configuration
+      ansible.builtin.replace:
+        path: /etc/network/interfaces
+        regexp: 'enp0s3'
+        replace: 'eth0'
+
+    - name: Reboot
+      ansible.builtin.reboot:
+        reboot_timeout: 300

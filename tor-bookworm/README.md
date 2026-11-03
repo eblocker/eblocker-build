@@ -61,8 +61,9 @@ only `tor` and `tor-geoipdb` to 0.4.9.15. After restarting `tor@eblocker`, it
 reached 100% bootstrap; HTTPS through its Unix SOCKS socket returned HTTP 200
 and Tor Project's API reported `IsTor: true`. The package versions, 100%
 bootstrap, HTTPS 200 and `IsTor: true` were confirmed again after a VM reboot.
-The two running 4.1.0 VMs were not modified. An eBlockerOS 4.1.0 Raspberry Pi
-runtime was not available for this test; the `arm64` build was tested on the
+Neither running 4.1.0 VM received a package change; a snapshot of one was used
+to create the isolated clone. An eBlockerOS 4.1.0 Raspberry Pi runtime was not
+available for this test; the `arm64` build was tested on the
 Bookworm-based 4.0.3 Pi as described above.
 
 A routed eBlocker device test, upstream unit tests and maintainer review remain

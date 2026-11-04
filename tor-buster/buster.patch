@@ -1,0 +1,29 @@
+--- a/debian/control
++++ b/debian/control
+@@ -2,7 +2,7 @@
+ Section: net
+ Priority: optional
+ Maintainer: Peter Palfrader <weasel@debian.org>
+-Build-Depends: debhelper (>= 10), quilt, libssl-dev, zlib1g-dev, libevent-dev (>= 1.1), asciidoc (>= 8.2), docbook-xml, docbook-xsl, xmlto, dh-apparmor, libseccomp-dev [amd64 i386], libsystemd-dev [linux-any], pkg-config [linux-any], libcap-dev [linux-any], dh-autoreconf, liblzma-dev, libzstd-dev, dh-runit (>= 2.8.8)
++Build-Depends: debhelper (>= 10), quilt, libssl-dev, zlib1g-dev, libevent-dev (>= 1.1), asciidoc (>= 8.2), docbook-xml, docbook-xsl, xmlto, dh-apparmor, libseccomp-dev [amd64 i386], libsystemd-dev [linux-any], pkg-config [linux-any], libcap-dev [linux-any], dh-autoreconf, liblzma-dev, libzstd-dev
+ Build-Conflicts: libnacl-dev, libseccomp-dev [!amd64 !i386]
+ Standards-Version: 4.4.0
+ Homepage: https://www.torproject.org/
+@@ -14,7 +14,6 @@
+ Depends: ${shlibs:Depends}, adduser, ${misc:Depends}, lsb-base
+ Pre-Depends: ${misc:Pre-Depends}
+ Conflicts: libssl0.9.8 (<< 0.9.8g-9)
+-Breaks: ${runit:Breaks}
+ Recommends: logrotate, tor-geoipdb, torsocks
+ Suggests: mixmaster, torbrowser-launcher, socat, apparmor-utils, nyx, obfs4proxy
+ Description: anonymizing overlay network for TCP
+--- a/debian/rules
++++ b/debian/rules
+@@ -24,7 +24,6 @@
+ 		$@ \
+ 		--with quilt \
+ 		--with autoreconf \
+-		--with runit \
+ 		$(dhoptions) \
+ 		--builddirectory=build \
+ 		--parallel

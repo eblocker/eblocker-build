@@ -1,9 +1,9 @@
-# Tor 0.4.9.15 for eBlockerOS 3
+# Tor 0.4.9.17 for eBlockerOS 3
 
 eBlockerOS 3.2.3 is based on Debian/Raspbian Buster and currently supplies Tor
 0.4.5.16. That client rejects the Tor network consensus with missing
 `Desc=3 Microdesc=3` protocols ([issue #460][issue]). This directory proposes
-a reproducible Buster backport from Tor Project's 0.4.9.15 source and Debian
+a reproducible Buster backport from Tor Project's 0.4.9.17 source and Debian
 packaging. It does not contain third-party source archives or built binaries.
 
 The only packaging change is to remove `dh-runit`: Buster's available version
@@ -31,8 +31,9 @@ DEBFULLNAME='Your Name' DEBEMAIL='you@example.org' \
 
 The script downloads three pinned inputs over HTTPS, checks their SHA256
 digests, applies `buster.patch`, checks Debian build dependencies, and creates
-`tor` and `tor-geoipdb` packages. The upstream tarball's signed checksum was
-also verified in the lab against Tor developer keys; release engineering
+`tor` and `tor-geoipdb` packages. For 0.4.9.17, the upstream tarball's
+checksum was verified against signatures from David Goulet and Alexander
+Færøy with the fingerprints published by the Tor Project. Release engineering
 should repeat that signature check independently. The default version suffix
 `~eblab10+1` identifies the tested lab build. A maintainer can set
 `PACKAGE_VERSION` for an official repository revision.
@@ -41,7 +42,23 @@ The lab builds used `DEB_BUILD_OPTIONS=nocheck`, so upstream unit tests were
 not run. For a release build, run the test suite by passing an empty value:
 `DEB_BUILD_OPTIONS='' ./build.sh ...`.
 
-## Validation on 3 November 2026
+## Source validation on 19 November 2026
+
+The 0.4.9.17 tarball, Debian source descriptor and packaging diff matched the
+SHA256 values pinned in `build.sh`. The signed upstream tarball checksum was
+verified against the two Tor developer keys. `dpkg-source -x` succeeded and
+`buster.patch` applied in a dry run. The historical runtime results below
+belong to 0.4.9.15.
+
+The `amd64` recipe then completed in an isolated Debian 10 Buster chroot with
+`DEB_BUILD_OPTIONS=nocheck`. Its `tor` and `tor-geoipdb` packages installed in
+that chroot; `tor --version` reported 0.4.9.17, the default configuration
+validated, and `dpkg --audit` reported no problem. This does not establish a
+working Tor circuit on eBlockerOS 3. The Buster runtime warned that its
+OpenSSL 1.1.1 is no longer maintained. Upstream unit tests, an eBlockerOS 3
+runtime test of the new lab packages and an `armhf` build remain open.
+
+## Historical runtime validation on 3 November 2026 (0.4.9.15)
 
 | Target | Installation and network result |
 | --- | --- |

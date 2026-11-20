@@ -38,7 +38,7 @@ Release engineering should repeat that signature check. The default
 Lab builds use `DEB_BUILD_OPTIONS=nocheck`; upstream unit tests are not run.
 Pass `DEB_BUILD_OPTIONS=''` to run them in a release build.
 
-## Source and client validation on 19 November 2026
+## Source and client validation on 19–20 November 2026
 
 The 0.4.9.17 tarball, Debian source descriptor and packaging diff matched the
 SHA256 values pinned in `build.sh`. The signed upstream tarball checksum was
@@ -57,8 +57,23 @@ Only those two packages were upgraded; the Tor Project keyring was added. After
 an explicit restart, `tor@eblocker` reached 100% bootstrap and Tor DNSPort
 answered a query. The eBlocker Tor configuration was unchanged. This validates
 the official binary path on one client; it is not an eBlocker runtime test of
-the lab packages produced by this recipe. An eBlocker runtime test of the lab
-output is still required before publishing those packages.
+the lab packages produced by this recipe. The separate `arm64` lab-package
+runtime test is described below; the `amd64` lab packages remain untested on
+an eBlockerOS 4 client.
+
+On 20 November, the same recipe was built natively in an isolated Debian 12
+`arm64` chroot on a Raspberry Pi 4 running eBlockerOS 4.0.3. The resulting
+`tor` and `tor-geoipdb` packages (`0.4.9.17-1~eblab12+1`) installed in that
+chroot; `tor --version` reported 0.4.9.17, the default configuration was valid,
+and `dpkg --audit` was clean. Only these two packages were then upgraded on the
+Pi from the previously tested 0.4.9.15 lab pair. After an explicit restart,
+`tor@eblocker` reached 100% bootstrap and an HTTPS request through its Unix
+SOCKS socket returned HTTP 200 and `IsTor: true` from Tor Project's status API.
+The eBlocker Tor configuration hash remained unchanged. The previous package
+pair was kept locally for rollback. After a Pi reboot, both package versions,
+100% bootstrap, HTTPS 200, `IsTor: true`, and the unchanged configuration hash
+were confirmed again. This is an eBlockerOS 4.0.3 `arm64` runtime test of the
+lab-built 0.4.9.17 packages; no 4.1.0 Pi runtime test was done.
 
 ## Historical lab validation on 3 November 2026 (0.4.9.15)
 

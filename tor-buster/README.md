@@ -42,7 +42,7 @@ The lab builds used `DEB_BUILD_OPTIONS=nocheck`, so upstream unit tests were
 not run. For a release build, run the test suite by passing an empty value:
 `DEB_BUILD_OPTIONS='' ./build.sh ...`.
 
-## Source validation on 19 November 2026
+## Source and client validation on 19–20 November 2026
 
 The 0.4.9.17 tarball, Debian source descriptor and packaging diff matched the
 SHA256 values pinned in `build.sh`. The signed upstream tarball checksum was
@@ -56,7 +56,18 @@ that chroot; `tor --version` reported 0.4.9.17, the default configuration
 validated, and `dpkg --audit` reported no problem. This does not establish a
 working Tor circuit on eBlockerOS 3. The Buster runtime warned that its
 OpenSSL 1.1.1 is no longer maintained. Upstream unit tests, an eBlockerOS 3
-runtime test of the new lab packages and an `armhf` build remain open.
+runtime test of the `amd64` lab packages on eBlockerOS 3 remains open.
+
+On 20 November, the recipe also built in a signed Raspbian 10 Buster `armhf`
+chroot on a Raspberry Pi 4. The resulting `tor` and `tor-geoipdb` packages
+(`0.4.9.17-1~eblab10+1`) installed in that chroot. `tor --version` reported
+0.4.9.17, the default configuration validated, and `dpkg --audit` was clean.
+A separate non-root Tor client in the chroot reached 100% bootstrap; an HTTPS
+request through its local SOCKS port returned HTTP 200 and `IsTor: true` from
+Tor Project's status API. The test client and its port were stopped afterward.
+This is a Raspbian Buster `armhf` network smoke test, not an eBlockerOS 3
+runtime integration test. Buster's OpenSSL 1.1.1 end-of-maintenance warning
+remains.
 
 ## Historical runtime validation on 3 November 2026 (0.4.9.15)
 
